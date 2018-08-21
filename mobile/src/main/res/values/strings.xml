@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MijiaGUI</string>
+    <string name="floatingSpeedPlaceholder">13</string>
+    <string name="floatSpeedMetric">km/h</string>
 </resources>

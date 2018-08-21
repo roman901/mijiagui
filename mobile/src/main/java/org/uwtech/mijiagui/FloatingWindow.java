@@ -6,17 +6,13 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.os.IBinder;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ImageButton;
 
 public class FloatingWindow extends Service {
 
@@ -57,8 +53,8 @@ public class FloatingWindow extends Service {
     WindowManager.LayoutParams mWindowsParams;
     private void moveView() {
         DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
-        int width = (int) (metrics.widthPixels * 0.7f);
-        int height = (int) (metrics.heightPixels * 0.45f);
+        int width = (int) (metrics.widthPixels * 0.5f);
+        int height = (int) (metrics.heightPixels * 0.23f);
 
         mWindowsParams = new WindowManager.LayoutParams(
                 width,//WindowManager.LayoutParams.WRAP_CONTENT,
@@ -145,35 +141,8 @@ public class FloatingWindow extends Service {
         LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mView = layoutInflater.inflate(R.layout.overlay_window, null);
 
-        final EditText edt1 = (EditText) mView.findViewById(R.id.edt1);
-        final TextView tvValue = (TextView) mView.findViewById(R.id.tvValue);
-        Button btnClose = (Button) mView.findViewById(R.id.btnClose);
-
-        edt1.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-
-            }
-        });
-
-        edt1.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                tvValue.setText(edt1.getText());
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-
-        btnClose.setOnClickListener(new View.OnClickListener() {
+        ImageButton fCloseBtn = mView.findViewById(R.id.floatCloseBtn);
+        fCloseBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 stopSelf();
