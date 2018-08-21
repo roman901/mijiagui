@@ -4,6 +4,5 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="floatingBackground">#dc616161</color>
-    <color name="floatingBackgroundBtn">#dc616161</color>
     <color name="floatingText">#dedede</color>
 </resources>

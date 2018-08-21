@@ -4,7 +4,7 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/floatingBackground"
+    android:background="@drawable/float_bg"
     tools:context="org.uwtech.mijiagui.MainActivity"
     android:orientation="vertical">
 
@@ -16,7 +16,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/ic_settings_black_24dp"
-            android:background="@color/floatingBackgroundBtn" />
+            android:background="@drawable/float_bg" />
         <Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/ic_close_black_24dp"
-            android:background="@color/floatingBackgroundBtn" />
+            android:background="@drawable/float_bg" />
     </LinearLayout>
 
     <TextView
