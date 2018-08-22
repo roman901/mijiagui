@@ -1,12 +1,15 @@
 package org.uwtech.mijiagui;
 
 import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -14,11 +17,17 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 
+
 public class FloatingWindow extends Service {
 
     private Context mContext;
     private WindowManager mWindowManager;
     private View mView;
+    private BroadcastReceiver br;
+
+    private boolean wasInFocus = true;
+
+    private String bluetoothMAC = "C2:75:BF:F4:33:B2"; // TODO(spark): make devices search dialog
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -35,19 +44,29 @@ public class FloatingWindow extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         mWindowManager = (WindowManager) getSystemService(WINDOW_SERVICE);
 
-        allAboutLayout(intent);
+        setupLayout();
         moveView();
 
+        tryToConnect(bluetoothMAC);
         return super.onStartCommand(intent, flags, startId);
     }
 
     @Override
     public void onDestroy() {
-
+        unregisterReceiver(br);
+        Intent intent = new Intent(this, BLEService.class);
+        stopService(intent);
         if (mView != null) {
             mWindowManager.removeView(mView);
         }
         super.onDestroy();
+    }
+
+    private void tryToConnect(String mac) {
+        Intent intent = new Intent(this, BLEService.class);
+        intent.putExtra("mac", mac);
+        stopService(intent);
+        startService(intent);
     }
 
     WindowManager.LayoutParams mWindowsParams;
@@ -67,7 +86,7 @@ public class FloatingWindow extends Service {
                 PixelFormat.TRANSLUCENT);
 
 
-        mWindowsParams.gravity = Gravity.TOP | Gravity.LEFT;
+        mWindowsParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL;
         //params.x = 0;
         mWindowsParams.y = 100;
         mWindowManager.addView(mView, mWindowsParams);
@@ -135,19 +154,22 @@ public class FloatingWindow extends Service {
         }
     }
 
-    private boolean wasInFocus = true;
-    private void allAboutLayout(Intent intent) {
+    private void setupLayout() {
 
         LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mView = layoutInflater.inflate(R.layout.overlay_window, null);
 
-        ImageButton fCloseBtn = mView.findViewById(R.id.floatCloseBtn);
-        fCloseBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                stopSelf();
+        br = new BroadcastReceiver() {
+            public void onReceive(Context context, Intent intent) {
+                Log.d("MijiaGUI", "onReceive");
             }
-        });
+        };
+
+        IntentFilter intFilt = new IntentFilter(MainActivity.BLE_BROADCAST_MSG);
+        registerReceiver(br, intFilt);
+
+        ImageButton fCloseBtn = mView.findViewById(R.id.floatCloseBtn);
+        fCloseBtn.setOnClickListener(view -> stopSelf());
 
     }
 

@@ -31,10 +31,11 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/floatSpeedText"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:text="@string/floatingSpeedPlaceholder"
+        android:text="@string/floatPlaceholder"
         android:textAlignment="center"
         android:gravity="center_vertical"
         android:textSize="40sp"
@@ -57,25 +58,28 @@
         android:layout_marginBottom="16dp">
 
         <TextView
+            android:id="@+id/floatCurrentText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="1.0A"
+            android:text="@string/floatPlaceholder"
             android:textAlignment="center"
             android:textSize="18sp"
             android:textColor="@color/floatingText"
             android:layout_weight="1" />
         <TextView
+            android:id="@+id/floatBatteryText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="98%"
+            android:text="@string/floatPlaceholder"
             android:textAlignment="center"
             android:textSize="18sp"
             android:textColor="@color/floatingText"
             android:layout_weight="1" />
         <TextView
+            android:id="@+id/floatEstimatedText"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="29.4 km"
+            android:text="@string/floatPlaceholder"
             android:textAlignment="center"
             android:textSize="18sp"
             android:textColor="@color/floatingText"
