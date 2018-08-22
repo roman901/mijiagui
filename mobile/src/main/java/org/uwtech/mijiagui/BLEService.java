@@ -20,6 +20,7 @@ import android.util.Log;
 import org.uwtech.mijiagui.api.MijiaAPI;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.uwtech.mijiagui.api.ResponseParser.hexStringToByteArray;
 
@@ -61,7 +62,8 @@ public class BLEService extends Service {
         public void onScanResult(int callbackType, ScanResult result) {
             BluetoothDevice device = result.getDevice();
             if (device.getAddress().equals(mac)) {
-                bluetoothGatt = device.connectGatt(getApplicationContext(), false, btleGattCallback);
+                bluetoothGatt = device.connectGatt(getApplicationContext(), false, btleGattCallback, BluetoothDevice.TRANSPORT_LE);
+                bluetoothGatt.requestMtu(512);
             }
         }
     };
@@ -71,14 +73,16 @@ public class BLEService extends Service {
         public void onConnectionStateChange(final BluetoothGatt gatt, final int status, final int newState) {
             switch (newState) {
                 case 0:
-                    Log.d("MijiaGUI", "BLEService disconnected");
+                    Log.d("MijiaGUI", "BLEService disconnected from device");
+                    System.exit(0);
                     break;
                 case 2:
-                    Log.d("MijiaGUI", "BLEService connected");
+                    Log.d("MijiaGUI", "BLEService connected to device");
                     bluetoothGatt.discoverServices();
                     break;
                 default:
-                    Log.d("MijiaGUI", "BLEService unknown state");
+                    Log.d("MijiaGUI", "BLEService entered unknown state");
+                    System.exit(0);
                     break;
             }
         }
@@ -86,48 +90,47 @@ public class BLEService extends Service {
         @Override
         public void onServicesDiscovered(final BluetoothGatt gatt, final int status) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
-                for (BluetoothGattService gattService : gatt.getServices()) {
-                    for (BluetoothGattCharacteristic characteristic : gattService.getCharacteristics()) {
-                        if (characteristic.getUuid().toString().equals(MijiaAPI.READ_CHARACTERISTIC_UUID)) {
-                            Log.i("MijiaGUI", "onServicesDiscovered: found Mijia Scooter");
-                            api = new MijiaAPI(gatt, characteristic);
-                            gatt.setCharacteristicNotification(characteristic, true);
-                            for (BluetoothGattDescriptor descriptor : characteristic.getDescriptors()) {
-                                descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
-                                gatt.writeDescriptor(descriptor);
-                            }
-                        }
-                    }
-                }
+                Log.d("MijiaGUI", "BLEService got services from device");
+                BluetoothGattService service = gatt.getService(UUID.fromString(MijiaAPI.SERVICE_UUID));
 
+                if (service !=null) {
+                    Log.i("MijiaGUI", "BLEService found Mijia Scooter");
+                    BluetoothGattCharacteristic characteristic = service.getCharacteristic(UUID.fromString(MijiaAPI.READ_CHARACTERISTIC_UUID));
+                    gatt.setCharacteristicNotification(characteristic, true);
+
+                    BluetoothGattDescriptor descriptor = characteristic.getDescriptor(UUID.fromString(MijiaAPI.NOTIFY_DESCRIPTOR_UUID));
+                    descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
+                    gatt.writeDescriptor(descriptor);
+                    api = new MijiaAPI(BLEService.this, gatt);
+                } else {
+                    Log.e("MijiaGUI", "BLEService not found Mijia Scooter");
+                    bluetoothGatt.disconnect();
+                }
             } else {
                 Log.w("MijiaGUI", "onServicesDiscovered received: " + status);
             }
         }
 
         @Override
-        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            super.onCharacteristicRead(gatt, characteristic, status);
-            Log.d("onCharacteristicRead", bytesToHex(characteristic.getValue()));
-        }
-
-        @Override
-        public void onCharacteristicWrite(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-            super.onCharacteristicWrite(gatt, characteristic, status);
-            Log.d("onCharacteristicWrite", bytesToHex(characteristic.getValue()));
-        }
-
-        @Override
         public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-            super.onCharacteristicChanged(gatt, characteristic);
-            Log.d("onCharacteristicChanged", bytesToHex(characteristic.getValue()));
+            api.gotCharacteristicChanged(characteristic.getValue());
+        }
+
+        @Override
+        public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor descriptor, int status) {
+            // Notifications now works
+            api.gotDescriptorWrite();
         }
     };
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        bluetoothGatt.disconnect();
+        if (bluetoothGatt != null) {
+            bluetoothGatt.disconnect();
+            bluetoothGatt.close();
+            System.exit(0);
+        }
     }
 
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();

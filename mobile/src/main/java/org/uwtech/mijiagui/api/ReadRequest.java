@@ -28,8 +28,4 @@ public class ReadRequest extends Message {
         bytes[6 + params.size()] = (byte) (v & 0xFF);
         bytes[7 + params.size()] = (byte) (v >> 8);
     }
-
-    public ReadRequest(byte[] bytes) {
-        super(bytes);
-    }
 }

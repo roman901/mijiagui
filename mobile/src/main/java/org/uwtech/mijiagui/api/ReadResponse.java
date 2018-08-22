@@ -6,6 +6,7 @@ public class ReadResponse extends Message {
 
     public ReadResponse(int from, byte[] bytes) {
         this.from = from;
+        this.bytes = bytes;
     }
 
     public int getFrom() {

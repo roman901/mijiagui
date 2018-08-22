@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public class ResponseParser {
 
-    public Message parse(byte[] bytes) throws Exception {
+    public ReadResponse parse(byte[] bytes) throws Exception {
 
         if (bytes[0] != (byte) 0x55 || bytes[1] != (byte) 0xAA) {
             throw new Exception("Message header is incorrect");
@@ -16,9 +16,9 @@ public class ResponseParser {
         throw new Exception("Unknown type");
     }
 
-    private Message parseRead(byte[] bytes) {
-        int length = bytes[2] & 0xFF - 2;
-        int from = bytes[6] & 0xFF;
+    private ReadResponse parseRead(byte[] bytes) {
+        int length = (bytes[2] & 0xFF) - 2;
+        int from = bytes[5] & 0xFF;
         byte[] data = Arrays.copyOfRange(bytes, 6, 6 + length);
         return new ReadResponse(from, data);
     }

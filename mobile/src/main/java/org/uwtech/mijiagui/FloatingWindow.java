@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Resources;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.os.IBinder;
@@ -13,9 +14,14 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.TextView;
+
+import org.uwtech.mijiagui.api.MijiaAPI;
+import org.w3c.dom.Text;
 
 
 public class FloatingWindow extends Service {
@@ -159,9 +165,34 @@ public class FloatingWindow extends Service {
         LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mView = layoutInflater.inflate(R.layout.overlay_window, null);
 
+        TextView floatingSpeed = mView.findViewById(R.id.floatSpeedText);
+        TextView floatingCurrent = mView.findViewById(R.id.floatCurrentText);
+        TextView floatingBattery = mView.findViewById(R.id.floatBatteryText);
+        TextView floatingEstimated = mView.findViewById(R.id.floatEstimatedText);
+        Resources res = getResources();
         br = new BroadcastReceiver() {
+            private int calc(byte[] bytes) {
+                return bytes[1] * 256 + bytes[0];
+            }
+
             public void onReceive(Context context, Intent intent) {
-                Log.d("MijiaGUI", "onReceive");
+                int from = intent.getIntExtra("from", -1);
+                byte[] bytes = intent.getByteArrayExtra("bytes");
+                if (from == MijiaAPI.Command.SPEED.command) {
+                    floatingSpeed.setText(String.valueOf((float) (calc(bytes)/1000)));
+                } else if (from == MijiaAPI.Command.CURRENT.command) {
+                    float current = calc(bytes);
+                    if (current > 32768) {
+                        current -= 65536;
+                    } else {
+                        current /= 100;
+                    }
+                    floatingCurrent.setText(res.getString(R.string.floatCurrent, current));
+                } else if (from == MijiaAPI.Command.BATTERY.command) {
+                    floatingBattery.setText(res.getString(R.string.floatBattery, calc(bytes)));
+                } else if (from == MijiaAPI.Command.REMAINING_MILEAGE.command) {
+                    floatingEstimated.setText(res.getString(R.string.floatRemainingMileage, (float) calc(bytes)/100));
+                }
             }
         };
 

@@ -2,4 +2,7 @@
     <string name="app_name">MijiaGUI</string>
     <string name="floatPlaceholder">--</string>
     <string name="floatSpeedMetric">km/h</string>
+    <string name="floatCurrent">%1$.2f\nA</string>
+    <string name="floatBattery">%1$d%%</string>
+    <string name="floatRemainingMileage">%1$.2f km</string>
 </resources>

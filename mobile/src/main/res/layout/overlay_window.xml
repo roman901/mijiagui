@@ -52,35 +52,38 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp">
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp">
 
         <TextView
             android:id="@+id/floatCurrentText"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:text="@string/floatPlaceholder"
             android:textAlignment="center"
+            android:gravity="center_vertical"
             android:textSize="18sp"
             android:textColor="@color/floatingText"
             android:layout_weight="1" />
         <TextView
             android:id="@+id/floatBatteryText"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:text="@string/floatPlaceholder"
             android:textAlignment="center"
+            android:gravity="center_vertical"
             android:textSize="18sp"
             android:textColor="@color/floatingText"
             android:layout_weight="1" />
         <TextView
             android:id="@+id/floatEstimatedText"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:text="@string/floatPlaceholder"
             android:textAlignment="center"
+            android:gravity="center_vertical"
             android:textSize="18sp"
             android:textColor="@color/floatingText"
             android:layout_weight="1" />
