@@ -179,7 +179,7 @@ public class FloatingWindow extends Service {
                 int from = intent.getIntExtra("from", -1);
                 byte[] bytes = intent.getByteArrayExtra("bytes");
                 if (from == MijiaAPI.Command.SPEED.command) {
-                    floatingSpeed.setText(String.valueOf((float) (calc(bytes)/1000)));
+                    floatingSpeed.setText(res.getString(R.string.floatSpeed, (float) calc(bytes)/1000));
                 } else if (from == MijiaAPI.Command.CURRENT.command) {
                     float current = calc(bytes);
                     if (current > 32768) {

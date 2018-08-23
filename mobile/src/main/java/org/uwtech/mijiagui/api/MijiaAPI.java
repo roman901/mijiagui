@@ -62,6 +62,12 @@ public class MijiaAPI {
             e.printStackTrace();
         }
 
+        try {
+            Thread.sleep(50);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         switch (this.loop) {
             case 0:
                 requestValue(Command.SPEED);
