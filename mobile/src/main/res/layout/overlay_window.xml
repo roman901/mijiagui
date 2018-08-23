@@ -16,7 +16,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/ic_settings_black_24dp"
-            android:background="@drawable/float_bg" />
+            android:background="@drawable/float_btn_selector" />
         <Space
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/ic_close_black_24dp"
-            android:background="@drawable/float_bg" />
+            android:background="@drawable/float_btn_selector" />
     </LinearLayout>
 
     <TextView
@@ -87,5 +87,17 @@
             android:textSize="18sp"
             android:textColor="@color/floatingText"
             android:layout_weight="1" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_keyboard_arrow_down_black_24dp"
+            android:background="@drawable/float_bottom_btn_selector"/>
+
     </LinearLayout>
 </LinearLayout>
