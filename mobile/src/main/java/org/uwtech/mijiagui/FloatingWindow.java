@@ -18,6 +18,7 @@ import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.uwtech.mijiagui.api.MijiaAPI;
@@ -28,10 +29,14 @@ public class FloatingWindow extends Service {
 
     private Context mContext;
     private WindowManager mWindowManager;
+    private WindowManager.LayoutParams mWindowsParams;
     private View mView;
+    private DisplayMetrics metrics;
+
     private BroadcastReceiver br;
 
     private boolean wasInFocus = true;
+    private boolean morePanelState = false;
 
     private String bluetoothMAC = "C2:75:BF:F4:33:B2"; // TODO(spark): make devices search dialog
 
@@ -44,6 +49,7 @@ public class FloatingWindow extends Service {
     public void onCreate() {
         super.onCreate();
         mContext = this;
+        metrics = mContext.getResources().getDisplayMetrics();
     }
 
     @Override
@@ -75,11 +81,9 @@ public class FloatingWindow extends Service {
         startService(intent);
     }
 
-    WindowManager.LayoutParams mWindowsParams;
     private void moveView() {
-        DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
         int width = (int) (metrics.widthPixels * 0.5f);
-        int height = (int) (metrics.heightPixels * 0.23f);
+        int height = (int) (metrics.heightPixels * 0.25f);
 
         mWindowsParams = new WindowManager.LayoutParams(
                 width,//WindowManager.LayoutParams.WRAP_CONTENT,
@@ -90,7 +94,6 @@ public class FloatingWindow extends Service {
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL | WindowManager.LayoutParams.FLAG_WATCH_OUTSIDE_TOUCH, // Not displaying keyboard on bg activity's EditText
                 //WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE, //Not work with EditText on keyboard
                 PixelFormat.TRANSLUCENT);
-
 
         mWindowsParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL;
         //params.x = 0;
@@ -161,7 +164,6 @@ public class FloatingWindow extends Service {
     }
 
     private void setupLayout() {
-
         LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mView = layoutInflater.inflate(R.layout.overlay_window, null);
 
@@ -178,6 +180,7 @@ public class FloatingWindow extends Service {
             public void onReceive(Context context, Intent intent) {
                 int from = intent.getIntExtra("from", -1);
                 byte[] bytes = intent.getByteArrayExtra("bytes");
+                Log.d("MijiaGUI", "Got result command "+from+" with value "+calc(bytes));
                 if (from == MijiaAPI.Command.SPEED.command) {
                     floatingSpeed.setText(res.getString(R.string.floatSpeed, (float) calc(bytes)/1000));
                 } else if (from == MijiaAPI.Command.CURRENT.command) {
@@ -199,9 +202,27 @@ public class FloatingWindow extends Service {
         IntentFilter intFilt = new IntentFilter(MainActivity.BLE_BROADCAST_MSG);
         registerReceiver(br, intFilt);
 
+        LinearLayout fMorePanel = mView.findViewById(R.id.floatMorePanel);
+
         ImageButton fCloseBtn = mView.findViewById(R.id.floatCloseBtn);
         fCloseBtn.setOnClickListener(view -> stopSelf());
 
+        ImageButton fMoreBtn = mView.findViewById(R.id.floatMoreBtn);
+        fMoreBtn.setOnClickListener(view -> {
+            if (morePanelState) {
+                fMorePanel.setVisibility(View.GONE);
+                mWindowsParams.height = (int) (metrics.heightPixels * 0.25f);
+                fMoreBtn.setImageResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
+                mWindowManager.updateViewLayout(mView, mWindowsParams);
+                morePanelState = false;
+            } else {
+                fMorePanel.setVisibility(View.VISIBLE);
+                mWindowsParams.height = (int) (metrics.heightPixels * 0.39f);
+                mWindowManager.updateViewLayout(mView, mWindowsParams);
+                fMoreBtn.setImageResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
+                morePanelState = true;
+            }
+        });
     }
 
 

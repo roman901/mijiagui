@@ -10,6 +10,7 @@ import org.uwtech.mijiagui.BLEService;
 import org.uwtech.mijiagui.FloatingWindow;
 import org.uwtech.mijiagui.MainActivity;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +25,8 @@ public class MijiaAPI {
     private BLEService bleService;
     private BluetoothGatt connection;
     private BluetoothGattCharacteristic wCharacteristic;
+
+    private ArrayDeque<Message> queue = new ArrayDeque<>();
 
     private int loop = 0;
 
@@ -41,7 +44,7 @@ public class MijiaAPI {
         ReadRequest message = new ReadRequest(command.command, args);
 
         wCharacteristic.setValue(message.getBytes());
-        connection.writeCharacteristic(wCharacteristic);
+        Log.d("MijiaGUI", String.valueOf(connection.writeCharacteristic(wCharacteristic)));
     }
 
     public void gotDescriptorWrite() {
@@ -49,7 +52,6 @@ public class MijiaAPI {
     }
 
     public void gotCharacteristicChanged(byte[] data) {
-        //System.out.println(BLEService.bytesToHex(data));
         ResponseParser parser = new ResponseParser();
         try {
             ReadResponse response = parser.parse(data);
